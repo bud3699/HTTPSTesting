@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyroscope & Tilt Values</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        #gyro-data {
+            font-size: 24px;
+        }
+
+        .data {
+            margin: 10px 0;
+        }
+
+        #request-permission {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Phone Tilt/Gyro Values</h1>
+    <div id="gyro-data">
+        <div class="data">Alpha (Z-axis): <span id="alpha">0</span>°</div>
+        <div class="data">Beta (X-axis): <span id="beta">0</span>°</div>
+        <div class="data">Gamma (Y-axis): <span id="gamma">0</span>°</div>
+    </div>
+    <button id="request-permission">Request Motion Access</button>
+
+    <script>
+        // Function to start getting device orientation data
+        function startGyroTracking() {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function(event) {
+                    document.getElementById("alpha").textContent = event.alpha ? event.alpha.toFixed(2) : 0;
+                    document.getElementById("beta").textContent = event.beta ? event.beta.toFixed(2) : 0;
+                    document.getElementById("gamma").textContent = event.gamma ? event.gamma.toFixed(2) : 0;
+                }, true);
+            } else {
+                alert("DeviceOrientationEvent is not supported on your device/browser.");
+            }
+        }
+
+        // Check if the device requires permission (iOS 13+)
+        function requestDeviceMotionPermission() {
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            startGyroTracking();
+                        } else {
+                            alert('Permission denied. Cannot access gyro values.');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // For non-iOS devices, no permission request is required
+                startGyroTracking();
+            }
+        }
+
+        // Attach event listener to the button
+        document.getElementById("request-permission").addEventListener('click', requestDeviceMotionPermission);
+    </script>
+</body>
+</html>
